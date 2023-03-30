@@ -17,18 +17,27 @@ GPIO.setup(troyka, GPIO.OUT, initial = GPIO.HIGH)
 GPIO.setup(comp, GPIO.IN)
 
 def adc():
-    bin = 0
-    for index in range(7, -1, -1):
-        bin += 2**(index)               # Соответствующий разряд в единицу и сравниваем
+    left = -1
+    right = 256
 
-        GPIO.output(dac, dec2bin(bin))
+    while 1<3:
+
+        mid  = int((right + left)/2)
+        # print(mid)
+        GPIO.output(dac, dec2bin(mid))
         time.sleep(0.005)
 
         comp_val = GPIO.input(comp)
         
         if comp_val == 0:
-            bin -= 2**(index)
-    return bin
+            right = mid
+        else:
+            left = mid
+
+        if (right - left <= 1):
+            return int(mid)
+
+    return 0
 
 def get_cool_prog_bar(n):
 
@@ -36,21 +45,20 @@ def get_cool_prog_bar(n):
     #     return [1,1,1,1,1,1,1,1]
     # print(n)
 
-    n  = int( (n/256) * 10 )
 
-    bin_arr = dec2bin(n)
+    n   = int((n+5)/256 * 8)
+    print(n)
 
-    print(bin_arr)
+    if n >= 8:
+        n = 8
+        
+    arr = [0]*8
 
-    for i in range(0, 8):
-        if bin_arr[i] == 1:
-            for j in range(i, 8):
-                bin_arr[j] = 1
-            # print(bin_arr)
-            return bin_arr
-    # print(bin_arr)
+    for index in range(n):
+        arr[index] = 1
 
-    return bin_arr
+
+    return arr
 
 try:
     while True:
